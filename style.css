@@ -118,6 +118,10 @@ body {
     width: 5rem;
 }
 
+.active {
+    border: 5px solid orange;
+}
+
 .ticket-cont {
     width: 15rem;
     height: 12rem;
