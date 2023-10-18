@@ -127,6 +127,7 @@ body {
     height: 12rem;
     border-radius: 10px;
     background-color: coral;
+    position: relative;
 }
 
 .ticket-color {
@@ -141,4 +142,11 @@ body {
 
 .task-area {
 
+}
+
+.ticket-lock {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 2rem;
 }
