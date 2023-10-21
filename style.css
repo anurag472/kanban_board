@@ -141,7 +141,8 @@ body {
 }
 
 .task-area {
-
+    height: 95px;
+    overflow: scroll;
 }
 
 .ticket-lock {
