@@ -4,6 +4,7 @@ const removebtn = document.querySelector('.remove-btn')
 const mainContainer = document.querySelector('.main-cont')
 const allPriorityColors = document.querySelectorAll('.priority-color')
 const textAreaContainer = document.querySelector('.textarea-cont')
+const allFiltercontainers = document.querySelectorAll('.color')
 
 
 let currentPriorityColor = 'lightpink'
@@ -11,6 +12,7 @@ let isModalTaskOpen = false
 let isDeleteModeActive = false
 let isEditingCardContent = false
 const colorsArray = ['lightpink', 'lightgreen', 'lightblue', 'black']
+const ticketsArray = []
 
 addbtn.addEventListener('click', () => {
     if (isModalTaskOpen) {
@@ -64,28 +66,49 @@ function createTask(taskType, textValue, taskId) {
         <i class="fa-solid fa-lock"></i>
     </div>`
 
-    handlePriorityChange(newDiv)
-    handleLock(newDiv)
+    const foundTicketIndex = ticketsArray.findIndex(ele => {
+        return ele.id == taskId
+    })
+    if (foundTicketIndex == -1) {
+        const ticketObject = {
+            id: taskId,
+            type: taskType,
+            value: textValue
+        }
+        ticketsArray.push(ticketObject)
+    }
+
+    handlePriorityChange(newDiv, taskId)
+    handleLock(newDiv, taskId)
     handleRemoval(newDiv)
     mainContainer.appendChild(newDiv)
 }
 
-function handlePriorityChange(div){
+function handlePriorityChange(div,ticketId) {
     const coloredDiv = div.querySelector('.ticket-color')
+
+    const idx = findTicketIdx(ticketId)
 
     coloredDiv.addEventListener('click', event => {
         const currentColor = coloredDiv.classList[1]
         const index = colorsArray.findIndex(ele => ele === currentColor)
-        const newIndex = (index+1)% colorsArray.length
+        const newIndex = (index + 1) % colorsArray.length
         coloredDiv.classList.remove(currentColor)
         coloredDiv.classList.add(colorsArray[newIndex])
-        console.log(index)
+        ticketsArray[idx].type = colorsArray[newIndex]
     })
 }
 
-function handleLock(div) {
+function findTicketIdx(id){
+    return ticketsArray.findIndex(ele => {
+        return ele.id == id
+    })
+}
+
+function handleLock(div, ticketId) {
     const lock = div.querySelector('.ticket-lock > i')
     const taskAreaElement = div.querySelector('.task-area')
+    const idx = findTicketIdx(ticketId)
     lock.addEventListener('click', event => {
         if (!isEditingCardContent) {
             lock.classList.remove('fa-lock')
@@ -96,6 +119,7 @@ function handleLock(div) {
             lock.classList.add('fa-lock')
             lock.classList.remove('fa-lock-open')
             taskAreaElement.setAttribute('contenteditable', 'false')
+            ticketsArray[idx].value = taskAreaElement.innerText
         }
         isEditingCardContent = !isEditingCardContent
     })
@@ -118,4 +142,32 @@ removebtn.addEventListener('click', () => {
         alert('Delete mode has been de-activated')
         removebtn.style.color = 'white'
     }
+})
+
+allFiltercontainers.forEach(container => {
+    container.addEventListener('click', event => {
+        const filterColor = container.classList[0]
+
+        const filteredTasks = ticketsArray.filter(ele => {
+            return filterColor == ele.type
+        })
+        const allTicketsDiv = document.querySelectorAll('.ticket-cont')
+        allTicketsDiv.forEach(ticket => {
+            ticket.remove()
+        })
+        filteredTasks.forEach(filteredTask => {
+            createTask(filteredTask.type, filteredTask.value, filteredTask.id)
+        })
+
+
+    })
+    container.addEventListener('dblclick', event => {
+        const allTicketsDiv = document.querySelectorAll('.ticket-cont')
+        allTicketsDiv.forEach(ticket => {
+            ticket.remove()
+        })
+        ticketsArray.forEach(filteredTask => {
+            createTask(filteredTask.type, filteredTask.value, filteredTask.id)
+        })
+    })
 })
